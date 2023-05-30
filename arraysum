@@ -1,0 +1,32 @@
+.model small
+.stack 100h ;initializing stack
+.data
+arr db 11h,12h,13h,14h ;initializing array
+sum db 0 ;initializing sum with 0
+.code
+;moving data segment to ds
+mov ax , @data
+mov ds , ax
+
+;point bx to first element of array
+mov bx , offset arr
+
+;initialize al with o
+mov al , 00h
+
+;initialize counter
+mov cl , 04h
+
+;loop
+repeat : add al , [bx]
+inc bx
+dec cl
+jnz repeat ;jump if not zero to respective label
+
+;move the addition to sum and dx
+mov sum , al
+mov dl , sum
+
+int 3   ;to show result in hex form
+
+end
