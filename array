@@ -1,0 +1,78 @@
+input macro
+         mov ah,01h
+        int 21h
+         endm
+disp macro var
+     lea dx,var
+     mov ah,09h
+     int 21h
+endm
+output macro
+           mov ah,02h
+            int 21h
+endm
+.model small
+.stack 100h
+.data
+     
+     m1 db 10,13 ,&quot;Enter size of array:$&quot;
+     m2 db 10,&quot;Enter Number:$&quot;
+     m3 db 10,13,&quot;Addition is:$&quot;
+     m4 db 10,13 ,&quot;$&quot;                         ;Used for new line
+   array db 10 dup(0)   ;duplicate the memory depending on array size
+   count db 0          ;Stores no. of elements
+.code
+    ;While we take input ,suppose we we entered 5 it will store as 35 so subtract 30 everytime ;
+;from the number as it stores ascii values
+
+mov ax,@data
+mov ds,ax
+lea si,array
+disp m1
+input
+sub al,30h
+mov count,al
+mov cl,count
+disp m4
+s1: disp m2
+    input
+      mov [si],al
+    inc si
+
+    loop s1
+disp m4
+disp m3
+mov ax,000H                    ;ax is generally used to store result so ax register
+cleared(ax=0)
+mov cl,count                    ;(cl=5)
+lea si,array  ; ;It was pointing to last location of array to to point si to
+first location
+s2: add al,[si]      ;(al=00,si=first input their addition is stored is al)
+sub al,30h            ;To subtarct 30 as it takes ascii input
+inc si
+loop s2        
+
+mov ch, 02h                                                         ;  To store value 2 in ch for number of digits
+to display
+mov cl, 04h                                                         ;  cl stores value 4
+mov bl,al      
+s3: rol bl,cl                                                            ;To rotate the digits   Ex-addition is 67 -
+binary 0110 0111
+                                                                                       ; rotate 1   1100 1110
+                                                                                      ;  rotate 2  1001 1101
+                                                                                       ; rotate 3   0011 1011
+                                                                                      ;  rotate 4   0111 0110==&gt;76
+     mov dl,bl
+    and dl,0fh
+    cmp dl,09h
+     jbe s4
+    add dl,07
+
+s4: add dl,30h
+      output
+     dec ch
+     jnz s3
+     mov ah,4ch
+     int 21h
+
+end
